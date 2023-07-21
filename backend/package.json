@@ -1,0 +1,26 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "React realtime chat application",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx tsc",
+    "start": "npm run compile && node ./dist/index.js"
+  },
+  "author": "manav",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "prisma": "^5.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.7.5",
+    "@prisma/client": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "graphql": "^16.7.1",
+    "graphql-tag": "^2.12.6"
+  }
+}
