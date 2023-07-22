@@ -1,55 +1,38 @@
-import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import { gql } from "graphql-tag";
-import { PrismaClient } from "@prisma/client";
-export const prisma = new PrismaClient();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.prisma = void 0;
+const server_1 = require("@apollo/server");
+const standalone_1 = require("@apollo/server/standalone");
+const typeDefs_1 = require("./typeDefs");
+const client_1 = require("@prisma/client");
+exports.prisma = new client_1.PrismaClient();
 (async function () {
-    const typeDefs = gql `
-
-  type Post {
-    id: String
-    title: String
-    description: String
-  }
-
-  type User {
-    username: String
-    name:     String
-  }
-
-  type Query {
-    getAllPosts: [Post]
-    getAllUsers: [User]
-  }
-
-  type Mutation {
-    createPost(title: String, description: String): Post
-  }
-`;
     const resolvers = {
         Mutation: {
-            createPost: async (_parent, args) => {
-                return await prisma.post.create({
+            createUser: async (_parent, args) => {
+                return await exports.prisma.user.create({
                     data: {
-                        title: args.title,
-                        description: args.description
-                    }
+                        email: args.email,
+                        name: args.name,
+                        password: args.password,
+                        username: args.username,
+                    },
                 });
-            }
+            },
         },
         Query: {
-            getAllPosts: async () => {
-                return await prisma.post.findMany();
-            },
             getAllUsers: async () => {
-                return await prisma.user.findMany();
-            }
-        }
+                return await exports.prisma.user.findMany();
+            },
+        },
     };
-    const server = new ApolloServer({
-        typeDefs,
-        resolvers
+    const server = new server_1.ApolloServer({
+        typeDefs: typeDefs_1.typeDefs,
+        resolvers,
     });
-    const { url } = await startStandaloneServer(server, { listen: { port: 4000 } });
+    const { url } = await (0, standalone_1.startStandaloneServer)(server, {
+        listen: { port: 4000 },
+    });
     console.log(`🚀 Server listening at: ${url}`);
 })();
+//# sourceMappingURL=index.js.map
