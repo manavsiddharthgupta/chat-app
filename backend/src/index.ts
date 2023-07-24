@@ -32,18 +32,6 @@ app.use(cors());
   }
 
   const resolvers = {
-    Mutation: {
-      createUser: async (_parent: any, args: CreateUser) => {
-        return await prisma.user.create({
-          data: {
-            email: args.email,
-            name: args.name,
-            password: args.password,
-            username: args.username,
-          },
-        });
-      },
-    },
     Query: {
       getAllUsers: async () => {
         return await prisma.user.findMany();

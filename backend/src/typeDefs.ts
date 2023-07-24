@@ -9,13 +9,4 @@ export const typeDefs = gql`
   type Query {
     getAllUsers: [User]
   }
-
-  type Mutation {
-    createUser(
-      name: String
-      username: String
-      password: String
-      email: String
-    ): User
-  }
 `;
