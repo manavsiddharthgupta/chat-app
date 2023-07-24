@@ -31,7 +31,15 @@ export const Chatsidebar = () => {
   console.log(myInfo);
 
   useEffect(() => {
-    const jwtToken = document.cookie.split("=")[1];
+    const cookieString = document.cookie;
+    console.log(cookieString);
+    const cookies: any = {};
+    const cookieArray = cookieString.split(";");
+    cookieArray.forEach((cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      cookies[key] = value;
+    });
+    const jwtToken = cookies.cookie;
     if (jwtToken) {
       const decoded: myInfo = jwt_decode(jwtToken);
       setMyInfo(decoded);
