@@ -1,10 +1,25 @@
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./typeDefs";
-
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import express from "express";
+import http from "http";
+import cors from "cors";
+import { json } from "body-parser";
 import { PrismaClient } from "@prisma/client";
+import session from "express-session";
+import passport from "passport";
+import googlePassportConfig from "./lib/passport";
+import authRoute from "./routes/auth";
+
+type User = {
+	id?: string;
+};
 
 export const prisma = new PrismaClient();
+
+const app = express();
+const httpServer = http.createServer(app);
 
 (async function () {
 	interface CreateUser {
@@ -37,11 +52,51 @@ export const prisma = new PrismaClient();
 	const server = new ApolloServer({
 		typeDefs,
 		resolvers,
+		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 	});
 
-	const { url } = await startStandaloneServer(server, {
-		listen: { port: 4000 },
+	await server.start();
+	app.use(
+		"/graphql",
+		cors<cors.CorsRequest>(),
+		json(),
+		expressMiddleware(server, {
+			context: async ({ req }) => ({ token: req.headers.token }),
+		})
+	);
+
+	app.use(
+		session({
+			secret: "secretcode",
+			resave: true,
+			saveUninitialized: true,
+			cookie: {
+				sameSite: "none",
+				secure: true,
+				maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
+			},
+		})
+	);
+
+	app.use(passport.initialize());
+	app.use(passport.session());
+
+	passport.serializeUser((user: User, done) => {
+		console.log(user);
+		return done(null, user.id);
 	});
 
-	console.log(`🚀 Server listening at: ${url}`);
+	passport.deserializeUser((id: string, done) => {
+		// Whatever we return goes to the client and binds to the req.user property
+		return done(null, id);
+	});
+
+	googlePassportConfig();
+
+	app.use("/auth", authRoute);
+
+	await new Promise<void>((resolve) =>
+		httpServer.listen({ port: 4000 }, resolve)
+	);
+	console.log(`🚀 Server ready at http://localhost:4000/graphql`);
 })();
