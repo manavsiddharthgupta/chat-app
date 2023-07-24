@@ -12,12 +12,9 @@ router.get(
 	"/google/callback",
 	passport.authenticate("google", { failureRedirect: "http://localhost:3000" }),
 	(req, res) => {
+		//res.cookie("cookie", req.user); // Sets cookie
 		res.redirect("http://localhost:3000/chat");
 	}
 );
-
-router.get("/getuser", (req, res) => {
-	res.send(req.user);
-});
 
 export default router;

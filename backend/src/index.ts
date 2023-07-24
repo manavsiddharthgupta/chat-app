@@ -21,6 +21,8 @@ export const prisma = new PrismaClient();
 const app = express();
 const httpServer = http.createServer(app);
 
+app.use(cors());
+
 (async function () {
 	interface CreateUser {
 		name: string;
@@ -86,9 +88,9 @@ const httpServer = http.createServer(app);
 		return done(null, user.id);
 	});
 
-	passport.deserializeUser((id: string, done) => {
+	passport.deserializeUser((user: User, done) => {
 		// Whatever we return goes to the client and binds to the req.user property
-		return done(null, id);
+		return done(null, user);
 	});
 
 	googlePassportConfig();
