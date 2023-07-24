@@ -21,7 +21,7 @@ router.get(
         select: { id: true, email: true, name: true, avatar: true },
       });
       if (user) {
-        const token = jwt.sign({ user: user }, `${process.env.JWT_SECRET}`, {
+        const token = jwt.sign(user, `${process.env.JWT_SECRET}`, {
           expiresIn: "7days",
         });
         res.cookie("cookie", token); // Sets cookie
@@ -35,7 +35,7 @@ router.get(
           select: { id: true, email: true, name: true, avatar: true },
         });
         console.log(newUser);
-        const token = jwt.sign({ user: newUser }, `${process.env.JWT_SECRET}`, {
+        const token = jwt.sign(newUser, `${process.env.JWT_SECRET}`, {
           expiresIn: "7days",
         });
         res.cookie("cookie", token); // Sets cookie
