@@ -3,7 +3,6 @@ import { typeDefs } from "./typeDefs";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import express from "express";
-import http from "http";
 import cors from "cors";
 import { json } from "body-parser";
 import { PrismaClient } from "@prisma/client";
@@ -11,6 +10,11 @@ import session from "express-session";
 import passport from "passport";
 import googlePassportConfig from "./lib/passport";
 import authRoute from "./routes/auth";
+import { PubSub } from "graphql-subscriptions";
+import { createServer } from "http";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/lib/use/ws";
 
 type User = {
   id?: string;
@@ -19,30 +23,92 @@ type User = {
 export const prisma = new PrismaClient();
 
 const app = express();
-const httpServer = http.createServer(app);
+const httpServer = createServer(app);
 
 app.use(cors());
 
-(async function () {
-  interface CreateUser {
-    name: string;
-    username: string;
-    password: string;
-    email: string;
-  }
+const pubsub = new PubSub();
 
+(async function () {
   const resolvers = {
     Query: {
       getAllUsers: async () => {
         return await prisma.user.findMany();
       },
+      getAllRooms: async () => {
+        return await prisma.room.findMany();
+      },
+    },
+    Mutation: {
+      createRoom: async (_: any, args: any) => {
+        const { name, description } = args;
+        return await prisma.room.create({
+          data: {
+            name,
+            description,
+          },
+        });
+      },
+      createMessage: async (_: any, args: any) => {
+        const { body, roomId, senderId } = args;
+        const mesRes = await prisma.message.create({
+          data: {
+            body,
+            senderId,
+            roomId,
+          },
+          select: {
+            id: true,
+            body: true,
+            sender: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            room: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+        pubsub.publish(`messageSent ${roomId}`, { messageSent: mesRes });
+        return mesRes;
+      },
+    },
+    Subscription: {
+      messageSent: {
+        subscribe: async (_: any, args: any, context: any) => {
+          const { roomId } = args;
+          return pubsub.asyncIterator(`messageSent ${roomId}`);
+        },
+      },
     },
   };
 
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/graphql/subscription",
+  });
+  const serverCleanup = useServer({ schema }, wsServer);
+
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
   });
 
   await server.start();
