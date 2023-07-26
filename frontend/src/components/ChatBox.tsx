@@ -1,10 +1,15 @@
+import { useEffect } from "react";
 import { MessageContainer } from "./Message";
 import { MessageInput } from "./MessageInput";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import { Separator } from "./ui/separator";
 
-export const ChatBox = () => {
+export const ChatBox = ({ roomId }: { roomId: string }) => {
+  useEffect(() => {
+    console.log("roomId", roomId);
+  }, [roomId]);
+
   return (
     <main className="w-[calc(100%-320px)] flex justify-center items-center h-screen">
       <div className="max-w-3xl w-full max-h-[450px] h-full bg-[#ededed] mx-2 rounded-3xl relative">

@@ -6,3 +6,10 @@ export interface myInfo {
   exp: number;
   iat: number;
 }
+
+export interface Room {
+  description: string;
+  id: string;
+  name: string;
+  __typename: string;
+}

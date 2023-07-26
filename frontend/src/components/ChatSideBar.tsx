@@ -5,7 +5,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { useEffect, useState } from "react";
 import jwt_decode from "jwt-decode";
-import { myInfo } from "../lib/types";
+import { Room, myInfo } from "../lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +16,13 @@ import {
 } from "./ui/dropdown-menu";
 import { UserCard } from "./User";
 import { useNavigate } from "react-router";
+import { gql, useQuery } from "@apollo/client";
 
-export const Chatsidebar = () => {
+export const Chatsidebar = ({
+  onSelectRoomChat,
+}: {
+  onSelectRoomChat: (roomId: string) => void;
+}) => {
   const [myInfo, setMyInfo] = useState<myInfo>({
     id: "",
     name: "Anonymous",
@@ -27,6 +32,31 @@ export const Chatsidebar = () => {
     exp: 0,
     iat: 0,
   });
+  const GET_ROOM = gql`
+    query GetAllRooms {
+      getAllRooms {
+        name
+        id
+        description
+      }
+    }
+  `;
+  const {
+    loading: roomsLoading,
+    error: roomsError,
+    data: roomsData,
+  } = useQuery(GET_ROOM);
+
+  const roomComp = roomsLoading ? (
+    <p>Loading...</p>
+  ) : roomsError ? (
+    <p>Error :</p>
+  ) : (
+    roomsData?.getAllRooms.map((room: Room) => {
+      return <UserCard key={room.id} roomData={room} />;
+    })
+  );
+
   const navigate = useNavigate();
   console.log(myInfo);
 
@@ -57,33 +87,12 @@ export const Chatsidebar = () => {
       />
       <p className="text-gray-500 font-bold text-sm mt-2 px-2">Rooms</p>
       <ScrollArea className="px-2 mt-2 h-1/3">
-        <ul className="text-black ">
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-        </ul>
+        <ul className="text-black ">{roomComp}</ul>
       </ScrollArea>
       <Separator className="mb-2 bg-slate-200" />
       <p className="text-gray-500 font-bold text-sm px-2">Users</p>
       <ScrollArea className="px-2 mt-2 h-1/3">
-        <ul className="text-black ">
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-          <UserCard />
-        </ul>
+        <ul className="text-black "></ul>
       </ScrollArea>
       <Separator className="mb-2 bg-slate-200" />
       <div className="py-2 absolute bottom-2 w-11/12 flex items-center justify-between px-2 hover:bg-[#0000000f] rounded-lg cursor-pointer bg-white">
