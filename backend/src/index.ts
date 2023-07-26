@@ -47,11 +47,22 @@ const pubsub = new PubSub();
             name,
             description,
           },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            messages: {
+              select: {
+                id: true,
+                body: true,
+              },
+            },
+          },
         });
       },
       createMessage: async (_: any, args: any) => {
         const { body, roomId, senderId } = args;
-        const mesRes = await prisma.message.create({
+        const messageResponse = await prisma.message.create({
           data: {
             body,
             senderId,
@@ -73,8 +84,10 @@ const pubsub = new PubSub();
             },
           },
         });
-        pubsub.publish(`messageSent ${roomId}`, { messageSent: mesRes });
-        return mesRes;
+        pubsub.publish(`messageSent ${roomId}`, {
+          messageSent: messageResponse,
+        });
+        return messageResponse;
       },
     },
     Subscription: {

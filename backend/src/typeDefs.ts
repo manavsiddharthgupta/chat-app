@@ -10,8 +10,8 @@ export const typeDefs = gql`
   type Message {
     id: String
     body: String
-    senderId: String
-    roomId: String
+    sender: User
+    room: Room
   }
 
   type Room {

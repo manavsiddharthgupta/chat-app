@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 import { Separator } from "./ui/separator";
 
-export const ChatBox = ({ roomId }: { roomId: string }) => {
+export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
   useEffect(() => {
     console.log("roomId", roomId);
   }, [roomId]);

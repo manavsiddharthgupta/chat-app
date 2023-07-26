@@ -1,12 +1,18 @@
 import { Room } from "../lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-export const UserCard = ({ roomData }: { roomData: Room }) => {
+export const UserCard = ({
+  roomData,
+  onSelectRoom,
+}: {
+  roomData: Room;
+  onSelectRoom: (roomId: string) => void;
+}) => {
   console.log(roomData);
   return (
     <li
       onClick={() => {
-        console.log(roomData.id);
+        onSelectRoom(roomData.id);
       }}
       className="flex items-center gap-4 hover:bg-[#0000000f] py-1 px-2 cursor-pointer rounded-md"
     >

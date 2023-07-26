@@ -9,7 +9,9 @@ const client = new ApolloClient({
 });
 
 export const Chat = () => {
-  const [chat, setChat] = useState<String>();
+  const [chat, setChat] = useState<string>();
+
+  console.log(chat);
 
   const onSelectRoom = (roomId: string) => {
     setChat(roomId);
@@ -17,7 +19,7 @@ export const Chat = () => {
   return (
     <ApolloProvider client={client}>
       <div className="flex">
-        <ChatBox roomId="a448cf91-4009-4442-81a1-2ad8d65fb451" />
+        <ChatBox roomId={chat} />
         <Chatsidebar onSelectRoomChat={onSelectRoom} />
       </div>
     </ApolloProvider>
