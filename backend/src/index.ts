@@ -101,6 +101,7 @@ const pubsub = new PubSub();
           select: {
             id: true,
             body: true,
+            createdAt: true,
             sender: {
               select: {
                 id: true,

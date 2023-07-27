@@ -3,6 +3,7 @@ import { MessageInput } from "./MessageInput";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Separator } from "./ui/separator";
+import { useEffect } from "react";
 
 export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
   const GET_ROOM = gql`
@@ -24,33 +25,56 @@ export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
     }
   `;
 
-  const GET_MESSAGE = gql`
-    subscription Subscription($roomId: String!) {
-      messageSent(roomId: $roomId) {
-        id
-        createdAt
-        body
-        sender {
-          name
-          email
-        }
-      }
-    }
-  `;
+  // const { data, loading: subscriptionloading } = useSubscription(GET_MESSAGE, {
+  //   variables: { roomId },
+  // });
 
-  const { data, loading: subscriptionloading } = useSubscription(GET_MESSAGE, {
-    variables: { roomId },
-  });
-
-  console.log(data);
+  // console.log(data);
 
   const {
     loading,
     error,
     data: roomData,
+    subscribeToMore,
   } = useQuery(GET_ROOM, {
     variables: { roomId },
   });
+
+  useEffect(() => {
+    const GET_MESSAGE = gql`
+      subscription Subscription($roomId: String!) {
+        messageSent(roomId: $roomId) {
+          id
+          createdAt
+          body
+          sender {
+            name
+            email
+          }
+        }
+      }
+    `;
+
+    const subscribeToNewMessage = () => {
+      subscribeToMore({
+        document: GET_MESSAGE,
+        variables: { roomId },
+        updateQuery: (prev, { subscriptionData }) => {
+          console.log(subscriptionData);
+          if (!subscriptionData.data) return prev;
+          const newMessage = subscriptionData.data.messageSent;
+          return Object.assign({}, prev, {
+            getRoomData: {
+              ...prev.getRoomData,
+              messages: [...prev.getRoomData.messages, newMessage],
+            },
+          });
+        },
+      });
+    };
+
+    subscribeToNewMessage();
+  }, [roomId]);
 
   return (
     <main className="w-[calc(100%-320px)] flex justify-center items-center h-screen">
