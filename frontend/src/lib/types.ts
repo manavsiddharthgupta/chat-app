@@ -13,3 +13,15 @@ export interface Room {
   name: string;
   __typename: string;
 }
+
+export interface Message {
+  body: string;
+  createdAt: string;
+  id: string;
+  sender: {
+    email: string;
+    name: string;
+    __typename: string;
+  };
+  __typename: string;
+}

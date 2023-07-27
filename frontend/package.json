@@ -19,6 +19,7 @@
     "clsx": "^2.0.0",
     "emoji-picker-react": "^4.4.10",
     "graphql": "^16.7.1",
+    "graphql-ws": "^5.14.0",
     "jwt-decode": "^3.1.2",
     "lucide-react": "^0.262.0",
     "react": "^18.2.0",

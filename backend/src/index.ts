@@ -38,6 +38,36 @@ const pubsub = new PubSub();
       getAllRooms: async () => {
         return await prisma.room.findMany();
       },
+      getRoomData: async (_: any, args: any) => {
+        const { roomId } = args;
+        return await prisma.room.findUnique({
+          where: {
+            id: roomId,
+          },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            messages: {
+              orderBy: {
+                createdAt: "asc",
+              },
+              select: {
+                id: true,
+                body: true,
+                createdAt: true,
+                sender: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      },
     },
     Mutation: {
       createRoom: async (_: any, args: any) => {
@@ -75,6 +105,7 @@ const pubsub = new PubSub();
               select: {
                 id: true,
                 name: true,
+                email: true,
               },
             },
             room: {

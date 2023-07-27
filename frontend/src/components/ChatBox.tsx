@@ -1,14 +1,56 @@
-import { useEffect } from "react";
 import { MessageContainer } from "./Message";
 import { MessageInput } from "./MessageInput";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-
+import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Separator } from "./ui/separator";
 
 export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
-  useEffect(() => {
-    console.log("roomId", roomId);
-  }, [roomId]);
+  const GET_ROOM = gql`
+    query GetRoomData($roomId: String!) {
+      getRoomData(roomId: $roomId) {
+        name
+        messages {
+          id
+          body
+          createdAt
+          sender {
+            name
+            email
+          }
+        }
+        id
+        description
+      }
+    }
+  `;
+
+  const GET_MESSAGE = gql`
+    subscription Subscription($roomId: String!) {
+      messageSent(roomId: $roomId) {
+        id
+        createdAt
+        body
+        sender {
+          name
+          email
+        }
+      }
+    }
+  `;
+
+  const { data, loading: subscriptionloading } = useSubscription(GET_MESSAGE, {
+    variables: { roomId },
+  });
+
+  console.log(data);
+
+  const {
+    loading,
+    error,
+    data: roomData,
+  } = useQuery(GET_ROOM, {
+    variables: { roomId },
+  });
 
   return (
     <main className="w-[calc(100%-320px)] flex justify-center items-center h-screen">
@@ -19,12 +61,30 @@ export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="text-[#00000097]">
-            <p className="font-semibold text-sm line-clamp-1">Shad</p>
-            <p className="text-xs line-clamp-1">I build ui component</p>
+            {loading ? (
+              <p className="text-black">Loading...</p>
+            ) : error ? (
+              <p className="text-black">Error :</p>
+            ) : (
+              <>
+                <p className="font-semibold text-sm line-clamp-1">
+                  {roomData?.getRoomData.name}
+                </p>
+                <p className="text-xs line-clamp-1">
+                  {roomData?.getRoomData.description}
+                </p>
+              </>
+            )}
           </div>
         </div>
         <Separator className="bg-gray-300" />
-        <MessageContainer />
+        {loading ? (
+          <p className="text-black">Loading...</p>
+        ) : error ? (
+          <p className="text-black">Error :</p>
+        ) : (
+          <MessageContainer messages={roomData?.getRoomData.messages} />
+        )}
         <div className="absolute bottom-0 left-0 w-full">
           <MessageInput />
         </div>

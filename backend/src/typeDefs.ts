@@ -12,6 +12,7 @@ export const typeDefs = gql`
     body: String
     sender: User
     room: Room
+    createdAt: String
   }
 
   type Room {
@@ -24,6 +25,7 @@ export const typeDefs = gql`
   type Query {
     getAllUsers: [User]
     getAllRooms: [Room]
+    getRoomData(roomId: String!): Room
   }
 
   type Subscription {
