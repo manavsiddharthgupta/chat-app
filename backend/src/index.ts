@@ -121,6 +121,35 @@ const pubsub = new PubSub();
         });
         return messageResponse;
       },
+      createMessagebyUser: async (_: any, args: any, context: any) => {
+        const { body, receiverId, senderId } = args;
+        return await prisma.message.create({
+          data: {
+            body,
+            receiverId,
+            senderId,
+          },
+          select: {
+            id: true,
+            body: true,
+            createdAt: true,
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            receiver: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+      },
     },
     Subscription: {
       messageSent: {

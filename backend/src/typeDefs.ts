@@ -2,6 +2,7 @@ import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
   type User {
+    id: String
     name: String
     email: String
     avatar: String
@@ -13,6 +14,7 @@ export const typeDefs = gql`
     sender: User
     room: Room
     createdAt: String
+    receiver: User
   }
 
   type Room {
@@ -35,5 +37,10 @@ export const typeDefs = gql`
   type Mutation {
     createRoom(name: String!, description: String!): Room
     createMessage(body: String!, roomId: String!, senderId: String!): Message
+    createMessagebyUser(
+      body: String!
+      receiverId: String!
+      senderId: String!
+    ): Message
   }
 `;
