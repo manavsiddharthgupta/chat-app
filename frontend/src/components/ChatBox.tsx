@@ -5,7 +5,13 @@ import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Separator } from "./ui/separator";
 import { useEffect } from "react";
 
-export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
+export const ChatBox = ({
+  roomId,
+  email,
+}: {
+  roomId: string;
+  email: string;
+}) => {
   const GET_ROOM = gql`
     query GetRoomData($roomId: String!) {
       getRoomData(roomId: $roomId) {
@@ -107,7 +113,10 @@ export const ChatBox = ({ roomId }: { roomId: string | undefined }) => {
         ) : error ? (
           <p className="text-black">Error :</p>
         ) : (
-          <MessageContainer messages={roomData?.getRoomData.messages} />
+          <MessageContainer
+            messages={roomData?.getRoomData.messages}
+            myEmail={email}
+          />
         )}
         <div className="absolute bottom-0 left-0 w-full">
           <MessageInput />

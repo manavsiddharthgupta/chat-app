@@ -68,6 +68,63 @@ const pubsub = new PubSub();
           },
         });
       },
+      getUserData: async (_: any, args: any) => {
+        const { friendId, myId } = args;
+        const userData = await prisma.user.findUnique({
+          where: {
+            id: friendId,
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+          },
+        });
+
+        const uniqueMessage = await prisma.message.findMany({
+          where: {
+            OR: [
+              {
+                AND: [
+                  {
+                    senderId: myId,
+                  },
+                  {
+                    receiverId: friendId,
+                  },
+                ],
+              },
+              {
+                AND: [
+                  {
+                    senderId: friendId,
+                  },
+                  {
+                    receiverId: myId,
+                  },
+                ],
+              },
+            ],
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+          select: {
+            id: true,
+            body: true,
+            createdAt: true,
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+        return { ...userData, messages: uniqueMessage };
+      },
     },
     Mutation: {
       createRoom: async (_: any, args: any) => {

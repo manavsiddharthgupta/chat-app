@@ -24,10 +24,19 @@ export const typeDefs = gql`
     description: String
   }
 
+  type UserData {
+    id: String
+    name: String
+    email: String
+    avatar: String
+    messages: [Message]
+  }
+
   type Query {
     getAllUsers: [User]
     getAllRooms: [Room]
     getRoomData(roomId: String!): Room
+    getUserData(friendId: String!, myId: String!): UserData
   }
 
   type Subscription {

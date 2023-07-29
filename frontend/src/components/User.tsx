@@ -3,16 +3,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export const UserCard = ({
   roomData,
-  onSelectRoom,
+  onSelect,
+  userData,
 }: {
-  roomData: Room;
-  onSelectRoom: (roomId: string) => void;
+  roomData?: Room;
+  onSelect: (roomId: string) => void;
+  userData?: any;
 }) => {
-  console.log(roomData);
+  // console.log(roomData);
+  const name = roomData ? roomData.name : userData.name;
+  const description = roomData ? roomData.description : userData.email;
   return (
     <li
       onClick={() => {
-        onSelectRoom(roomData.id);
+        if (roomData) {
+          onSelect(roomData.id);
+        } else if (userData) {
+          onSelect(userData.id);
+        }
       }}
       className="flex items-center gap-4 hover:bg-[#0000000f] py-1 px-2 cursor-pointer rounded-md"
     >
@@ -22,11 +30,9 @@ export const UserCard = ({
       </Avatar>
       <div>
         <p className="text-sm font-semibold text-gray-600 line-clamp-1">
-          {roomData.name}
+          {name}
         </p>
-        <p className="text-xs text-gray-500 line-clamp-1">
-          {roomData.description}
-        </p>
+        <p className="text-xs text-gray-500 line-clamp-1">{description}</p>
       </div>
     </li>
   );

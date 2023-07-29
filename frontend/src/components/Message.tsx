@@ -2,12 +2,18 @@ import { Card, CardContent } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { formatTime } from "../lib/utils";
 import { Message } from "../lib/types";
-export const MessageContainer = ({ messages }: { messages: Message[] }) => {
+export const MessageContainer = ({
+  messages,
+  myEmail,
+}: {
+  messages: Message[];
+  myEmail: string;
+}) => {
   console.log(messages);
   return (
     <ScrollArea className="h-[calc(100%-110px)] px-4">
       {messages.map((message: Message) => {
-        if (message.sender.email === "manavgupta14032003@gmail.com") {
+        if (message.sender.email === myEmail) {
           return <MyMessage key={message.id} messageBody={message} />;
         }
         return <SenderMessage key={message.id} messageBody={message} />;

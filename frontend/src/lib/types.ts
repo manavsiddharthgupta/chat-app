@@ -25,3 +25,8 @@ export interface Message {
   };
   __typename: string;
 }
+
+export interface ChatTypes {
+  id: string;
+  type: string;
+}
