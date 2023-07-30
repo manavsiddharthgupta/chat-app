@@ -11,13 +11,15 @@ export const MessageContainer = ({
 }) => {
   console.log(messages);
   return (
-    <ScrollArea className="h-[calc(100%-110px)] px-4">
-      {messages.map((message: Message) => {
-        if (message.sender.email === myEmail) {
-          return <MyMessage key={message.id} messageBody={message} />;
-        }
-        return <SenderMessage key={message.id} messageBody={message} />;
-      })}
+    <ScrollArea className="h-[calc(100%-110px)] px-6">
+      <div className="my-4">
+        {messages.map((message: Message) => {
+          if (message.sender.email === myEmail) {
+            return <MyMessage key={message.id} messageBody={message} />;
+          }
+          return <SenderMessage key={message.id} messageBody={message} />;
+        })}
+      </div>
     </ScrollArea>
   );
 };
@@ -27,7 +29,7 @@ export const SenderMessage = ({ messageBody }: { messageBody: Message }) => {
   const date = new Date(timestamp);
   const resultTime = formatTime(date.toISOString());
   return (
-    <Card className="bg-white h-fit max-w-xs w-fit px-2 mb-1">
+    <Card className="bg-white h-fit max-w-xs w-fit px-2 mb-2">
       <CardContent className="px-2 py-1">
         <p className="text-[0.5rem] text-gray-600">{messageBody.sender.name}</p>
         <p className="text-xs text-black">{messageBody.body}</p>
@@ -48,7 +50,7 @@ export const MyMessage = ({ messageBody }: { messageBody: Message }) => {
       <Card className="bg-black h-fit max-w-xs w-fit px-2 mb-1">
         <CardContent className="px-2 py-1">
           <p className="text-[0.5rem] text-gray-300">You</p>
-          <p className="text-xs">{messageBody.body}</p>
+          <p className="text-xs text-white">{messageBody.body}</p>
           <div className="flex justify-end items-center gap-1">
             <p className="text-[0.5rem] text-gray-300">{resultTime}</p>
           </div>

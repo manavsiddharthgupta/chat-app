@@ -14,6 +14,7 @@ import {
 } from "./ui/dropdown-menu";
 import { UserCard } from "./User";
 import { gql, useQuery } from "@apollo/client";
+import { SideBarLoading } from "./SideBarLoading";
 
 export const Chatsidebar = ({
   myProfile,
@@ -57,7 +58,7 @@ export const Chatsidebar = ({
   } = useQuery(GET_USERS);
 
   const userComp = usersLoading ? (
-    <p>Loading...</p>
+    <SideBarLoading />
   ) : usersError ? (
     <p>Error :</p>
   ) : (
@@ -70,7 +71,7 @@ export const Chatsidebar = ({
   );
 
   const roomComp = roomsLoading ? (
-    <p>Loading...</p>
+    <SideBarLoading />
   ) : roomsError ? (
     <p>Error :</p>
   ) : (

@@ -41,6 +41,7 @@ export const typeDefs = gql`
 
   type Subscription {
     messageSent(roomId: String!): Message
+    messageSentToUser(receiverId: String): Message
   }
 
   type Mutation {

@@ -180,7 +180,7 @@ const pubsub = new PubSub();
       },
       createMessagebyUser: async (_: any, args: any, context: any) => {
         const { body, receiverId, senderId } = args;
-        return await prisma.message.create({
+        const messageResponse = await prisma.message.create({
           data: {
             body,
             receiverId,
@@ -206,6 +206,10 @@ const pubsub = new PubSub();
             },
           },
         });
+        pubsub.publish(`messageSentToUser ${receiverId}`, {
+          messageSentToUser: messageResponse,
+        });
+        return messageResponse;
       },
     },
     Subscription: {
@@ -213,6 +217,12 @@ const pubsub = new PubSub();
         subscribe: async (_: any, args: any, context: any) => {
           const { roomId } = args;
           return pubsub.asyncIterator(`messageSent ${roomId}`);
+        },
+      },
+      messageSentToUser: {
+        subscribe: async (_: any, args: any, context: any) => {
+          const { receiverId } = args;
+          return pubsub.asyncIterator(`messageSentToUser ${receiverId}`);
         },
       },
     },

@@ -10,6 +10,7 @@ import { ChatTypes, myInfo } from "../lib/types";
 import jwt_decode from "jwt-decode";
 import { UserChatBox } from "./UserChatBox";
 import { useNavigate } from "react-router";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000/graphql",
@@ -84,21 +85,23 @@ export const Chat = () => {
     chat.type === "none" ? (
       <p>Select a chat</p>
     ) : chat.type === "room" ? (
-      <ChatBox email={myInfo.email} roomId={chat.id} />
+      <ChatBox myId={myInfo.id} email={myInfo.email} roomId={chat.id} />
     ) : (
-      <UserChatBox email={myInfo.email} userId={chat.id} />
+      <UserChatBox myId={myInfo.id} email={myInfo.email} userId={chat.id} />
     );
 
   return (
     <ApolloProvider client={client}>
-      <div className="flex">
-        {chatComp}
-        <Chatsidebar
-          myProfile={myInfo}
-          onSelectUserChat={onSelectUser}
-          onSelectRoomChat={onSelectRoom}
-        />
-      </div>
+      <ChakraProvider>
+        <div className="flex bg-[#000000e3]">
+          {chatComp}
+          <Chatsidebar
+            myProfile={myInfo}
+            onSelectUserChat={onSelectUser}
+            onSelectRoomChat={onSelectRoom}
+          />
+        </div>
+      </ChakraProvider>
     </ApolloProvider>
   );
 };

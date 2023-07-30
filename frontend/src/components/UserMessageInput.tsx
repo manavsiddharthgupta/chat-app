@@ -13,12 +13,12 @@ import { Smile, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
 
-export const MessageInput = ({
+export const UserMessageInput = ({
   myId,
-  roomId,
+  friendId,
 }: {
   myId: string;
-  roomId: string;
+  friendId: string;
 }) => {
   const [message, setMessage] = useState("");
 
@@ -30,28 +30,31 @@ export const MessageInput = ({
   };
 
   const SEND_MESSAGE = gql`
-    mutation CreateMessage(
+    mutation Mutation(
       $body: String!
-      $roomId: String!
+      $receiverId: String!
       $senderId: String!
     ) {
-      createMessage(body: $body, roomId: $roomId, senderId: $senderId) {
-        body
-        createdAt
+      createMessagebyUser(
+        body: $body
+        receiverId: $receiverId
+        senderId: $senderId
+      ) {
         id
+        createdAt
+        body
       }
     }
   `;
 
   const [sendMessage, { data, loading, error }] = useMutation(SEND_MESSAGE);
-
   console.log(data);
 
   const onSendMessage = () => {
     sendMessage({
       variables: {
         body: message,
-        roomId: roomId,
+        receiverId: friendId,
         senderId: myId,
       },
     });
