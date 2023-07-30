@@ -11,6 +11,7 @@ import jwt_decode from "jwt-decode";
 import { UserChatBox } from "./UserChatBox";
 import { useNavigate } from "react-router";
 import { ChakraProvider } from "@chakra-ui/react";
+import { InvalidChat } from "./InvalidChat";
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000/graphql",
@@ -83,7 +84,7 @@ export const Chat = () => {
 
   const chatComp =
     chat.type === "none" ? (
-      <p>Select a chat</p>
+      <InvalidChat />
     ) : chat.type === "room" ? (
       <ChatBox myId={myInfo.id} email={myInfo.email} roomId={chat.id} />
     ) : (

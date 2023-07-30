@@ -60,7 +60,9 @@ export const Chatsidebar = ({
   const userComp = usersLoading ? (
     <SideBarLoading />
   ) : usersError ? (
-    <p>Error :</p>
+    <p className="text-sm text-center font-bold text-red-500">
+      Oops something isn't right
+    </p>
   ) : (
     usersData?.getAllUsers.map((user: any) => {
       if (user.id === myProfile.id) return null;
@@ -73,7 +75,9 @@ export const Chatsidebar = ({
   const roomComp = roomsLoading ? (
     <SideBarLoading />
   ) : roomsError ? (
-    <p>Error :</p>
+    <p className="text-sm text-center font-bold text-red-500">
+      Oops something isn't right
+    </p>
   ) : (
     roomsData?.getAllRooms.map((room: Room) => {
       return (

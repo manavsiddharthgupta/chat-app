@@ -88,7 +88,9 @@ export const ChatBox = ({
             <UserCardLoading />
           </div>
         ) : error ? (
-          <p className="text-black">Error :</p>
+          <p className="text-sm text-center font-bold text-red-500 my-2">
+            Oops something isn't right
+          </p>
         ) : (
           <ChatHeader
             name={roomData?.getRoomData.name}
@@ -99,7 +101,9 @@ export const ChatBox = ({
         {loading ? (
           <MessageLoading />
         ) : error ? (
-          <p className="text-black">Error :</p>
+          <p className="text-sm text-center font-bold text-red-500 mt-4">
+            Oops something isn't right
+          </p>
         ) : (
           <MessageContainer
             messages={roomData?.getRoomData.messages}
