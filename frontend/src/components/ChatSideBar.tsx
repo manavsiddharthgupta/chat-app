@@ -15,6 +15,7 @@ import {
 import { UserCard } from "./User";
 import { gql, useQuery } from "@apollo/client";
 import { SideBarLoading } from "./SideBarLoading";
+import { useNavigate } from "react-router";
 
 export const Chatsidebar = ({
   myProfile,
@@ -25,6 +26,8 @@ export const Chatsidebar = ({
   onSelectUserChat: (roomId: string) => void;
   myProfile: myInfo;
 }) => {
+  const navigate = useNavigate();
+
   const GET_USERS = gql`
     query GetAllUsers {
       getAllUsers {
@@ -91,16 +94,16 @@ export const Chatsidebar = ({
       <Input
         placeholder="Search rooms and users"
         type="search"
-        className="bg-[#efefef] mt-2 rounded-xl text-black border-gray-300 placeholder:font-semibold placeholder:text-gray-500"
+        className="bg-[#efefef] mt-2 rounded-xl border-gray-300 placeholder:font-semibold placeholder:text-black"
       />
-      <p className="text-gray-500 font-bold text-sm mt-2 px-2">Rooms</p>
+      <p className="font-bold text-sm mt-2 px-2">Rooms</p>
       <ScrollArea className="px-2 mt-2 h-1/3">
-        <ul className="text-black ">{roomComp}</ul>
+        <ul>{roomComp}</ul>
       </ScrollArea>
       <Separator className="mb-2 bg-slate-200" />
-      <p className="text-gray-500 font-bold text-sm px-2">Users</p>
+      <p className="font-bold text-sm px-2">Users</p>
       <ScrollArea className="px-2 mt-2 h-1/3">
-        <ul className="text-black ">{userComp}</ul>
+        <ul>{userComp}</ul>
       </ScrollArea>
       <Separator className="mb-2 bg-slate-200" />
       <div className="py-2 absolute bottom-2 w-11/12 flex items-center justify-between px-2 hover:bg-[#0000000f] rounded-lg cursor-pointer bg-white">
@@ -109,17 +112,30 @@ export const Chatsidebar = ({
             <AvatarImage src={myProfile.avatar} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <p className="font-semibold text-gray-600">{myProfile.name}</p>
+          <p className="font-semibold">{myProfile.name}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Settings size={18} color="#474747" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="text-black bg-white">
+          <DropdownMenuContent className="bg-white">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                var Cookies = document.cookie.split(";");
+                // set past expiry to all cookies
+                for (var i = 0; i < Cookies.length; i++) {
+                  document.cookie =
+                    Cookies[i] + "=; expires=" + new Date(0).toUTCString();
+                }
+                navigate("/");
+              }}
+            >
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

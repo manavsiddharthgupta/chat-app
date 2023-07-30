@@ -94,7 +94,7 @@ export const Chat = () => {
   return (
     <ApolloProvider client={client}>
       <ChakraProvider>
-        <div className="flex bg-[#000000e3]">
+        <div className="flex bg-black">
           {chatComp}
           <Chatsidebar
             myProfile={myInfo}

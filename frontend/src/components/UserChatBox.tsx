@@ -115,18 +115,23 @@ export const UserChatBox = ({
             <UserCardLoading />
           </div>
         ) : error ? (
-          <p className="text-black">Error :</p>
+          <p className="text-sm rounded-t-3xl text-center font-bold py-4 bg-white text-red-500">
+            Oops something isn't right
+          </p>
         ) : (
           <ChatHeader
             name={userData?.getUserData.name}
             description={userData?.getUserData.email}
+            avatar={userData?.getUserData.avatar}
           />
         )}
         <Separator className="bg-gray-300" />
         {loading ? (
           <MessageLoading />
         ) : error ? (
-          <p className="text-black">Error :</p>
+          <p className="text-sm text-center font-bold text-red-500 mt-4">
+            Oops something isn't right
+          </p>
         ) : (
           <MessageContainer
             messages={userData?.getUserData.messages}

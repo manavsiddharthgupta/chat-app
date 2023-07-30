@@ -88,7 +88,7 @@ export const ChatBox = ({
             <UserCardLoading />
           </div>
         ) : error ? (
-          <p className="text-sm text-center font-bold text-red-500 my-2">
+          <p className="text-sm rounded-t-3xl text-center font-bold text-red-500 py-4 bg-white">
             Oops something isn't right
           </p>
         ) : (

@@ -65,7 +65,7 @@ export const MessageInput = ({
         onChange={onInputChangeHandler}
         placeholder="Type your message here ..."
         type="text"
-        className="bg-white text-black pl-10 pr-12 border-gray-300 placeholder:font-semibold placeholder:text-gray-500 rounded-b-3xl py-6"
+        className="bg-white text-black pl-10 pr-12 border-gray-300 placeholder:font-semibold placeholder:text-black rounded-b-3xl py-6"
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
