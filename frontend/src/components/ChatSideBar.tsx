@@ -121,9 +121,16 @@ export const Chatsidebar = ({
           <DropdownMenuContent className="bg-white">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>Profile</DropdownMenuItem> */}
             <DropdownMenuItem
-              className="cursor-pointer"
+              className="cursor-pointer text-black"
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Home
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer text-black"
               onClick={() => {
                 var Cookies = document.cookie.split(";");
                 // set past expiry to all cookies

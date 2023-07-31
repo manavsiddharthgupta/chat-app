@@ -72,8 +72,6 @@ export const Chat = () => {
     }
   }, [navigate]);
 
-  console.log(chat);
-
   const onSelectRoom = (roomId: string) => {
     setChat({ type: "room", id: roomId });
   };
