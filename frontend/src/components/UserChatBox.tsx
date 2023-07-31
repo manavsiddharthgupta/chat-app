@@ -5,7 +5,8 @@ import { ChatHeader } from "./ChatHeader";
 import { UserCardLoading } from "./SideBarLoading";
 import { MessageLoading } from "./MessageLoading";
 import { UserMessageInput } from "./UserMessageInput";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Message } from "../lib/types";
 
 export const UserChatBox = ({
   userId,
@@ -16,6 +17,15 @@ export const UserChatBox = ({
   email: string;
   myId: string;
 }) => {
+  const [allMessages, setMessages] = useState<Message[]>();
+
+  const onSetMessageHandler = (message: Message) => {
+    setMessages((currVal) => {
+      const newMessages = JSON.parse(JSON.stringify(currVal));
+      newMessages.push(message);
+      return newMessages;
+    });
+  };
   const GET_USERDATA = gql`
     query GetUserData($friendId: String!, $myId: String!) {
       getUserData(friendId: $friendId, myId: $myId) {
@@ -50,9 +60,12 @@ export const UserChatBox = ({
     subscribeToMore,
   } = useQuery(GET_USERDATA, {
     variables: { friendId: userId, myId: myId },
+    fetchPolicy: "no-cache",
   });
 
-  console.log(userData);
+  useEffect(() => {
+    setMessages(userData?.getUserData.messages);
+  }, [userData?.getUserData.messages]);
 
   useEffect(() => {
     const GET_MESSAGE = gql`
@@ -69,22 +82,6 @@ export const UserChatBox = ({
         }
       }
     `;
-
-    const userSubscription = subscribeToMore({
-      document: GET_MESSAGE,
-      variables: { receiverId: userId },
-      updateQuery: (prev, { subscriptionData }) => {
-        console.log(subscriptionData);
-        if (!subscriptionData.data) return prev;
-        const newMessage = subscriptionData.data.messageSentToUser;
-        return Object.assign({}, prev, {
-          getUserData: {
-            ...prev.getUserData,
-            messages: [...prev.getUserData.messages, newMessage],
-          },
-        });
-      },
-    });
     const mySubscription = subscribeToMore({
       document: GET_MESSAGE,
       variables: { receiverId: myId },
@@ -102,10 +99,9 @@ export const UserChatBox = ({
     });
 
     return () => {
-      userSubscription();
       mySubscription();
     };
-  }, [userId]);
+  }, []);
 
   return (
     <main className="w-[calc(100%-320px)] flex justify-center items-center h-screen">
@@ -133,13 +129,16 @@ export const UserChatBox = ({
             Oops something isn't right
           </p>
         ) : (
-          <MessageContainer
-            messages={userData?.getUserData.messages}
-            myEmail={email}
-          />
+          <MessageContainer messages={allMessages} myEmail={email} />
         )}
         <div className="absolute bottom-0 left-0 w-full">
-          <UserMessageInput key={userId} myId={myId} friendId={userId} />
+          <UserMessageInput
+            onSetMessage={onSetMessageHandler}
+            key={userId}
+            myId={myId}
+            email={email}
+            friendId={userId}
+          />
         </div>
       </div>
     </main>

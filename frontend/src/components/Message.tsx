@@ -6,14 +6,14 @@ export const MessageContainer = ({
   messages,
   myEmail,
 }: {
-  messages: Message[];
+  messages: Message[] | undefined;
   myEmail: string;
 }) => {
   console.log(messages);
   return (
     <ScrollArea className="h-[calc(100%-110px)] px-6">
       <div className="my-4">
-        {messages.map((message: Message) => {
+        {messages?.map((message: Message) => {
           if (message.sender.email === myEmail) {
             return <MyMessage key={message.id} messageBody={message} />;
           }
