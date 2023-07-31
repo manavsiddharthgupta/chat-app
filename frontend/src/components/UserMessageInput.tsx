@@ -16,11 +16,9 @@ import { gql, useMutation } from "@apollo/client";
 export const UserMessageInput = ({
   myId,
   friendId,
-  email,
 }: {
   myId: string;
   friendId: string;
-  email: string;
 }) => {
   const [message, setMessage] = useState("");
 
@@ -49,10 +47,11 @@ export const UserMessageInput = ({
     }
   `;
 
-  const [sendMessage, { data, loading, error }] = useMutation(SEND_MESSAGE);
+  const [sendMessage, { data }] = useMutation(SEND_MESSAGE);
   console.log(data);
 
-  const onSendMessage = async () => {
+  const onSendMessage = () => {
+    if (message.trim() === "") return;
     sendMessage({
       variables: {
         body: message,
@@ -63,6 +62,12 @@ export const UserMessageInput = ({
     setMessage("");
   };
 
+  const onEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onSendMessage();
+    }
+  };
+
   return (
     <div className="relative">
       <Input
@@ -70,6 +75,7 @@ export const UserMessageInput = ({
         onChange={onInputChangeHandler}
         placeholder="Type your message here ..."
         type="text"
+        onKeyDown={onEnterPress}
         className="bg-white text-black pl-10 pr-12 border-gray-300 placeholder:font-semibold placeholder:text-black rounded-b-3xl py-6"
       />
       <DropdownMenu>

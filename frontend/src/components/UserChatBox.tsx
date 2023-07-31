@@ -50,7 +50,7 @@ export const UserChatBox = ({
     subscribeToMore,
   } = useQuery(GET_USERDATA, {
     variables: { friendId: userId, myId: myId },
-    pollInterval: 1,
+    pollInterval: 1000,
   });
 
   console.log(userData);
@@ -130,12 +130,7 @@ export const UserChatBox = ({
           />
         )}
         <div className="absolute bottom-0 left-0 w-full">
-          <UserMessageInput
-            key={userId}
-            myId={myId}
-            email={email}
-            friendId={userId}
-          />
+          <UserMessageInput key={userId} myId={myId} friendId={userId} />
         </div>
       </div>
     </main>
