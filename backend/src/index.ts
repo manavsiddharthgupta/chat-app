@@ -10,7 +10,7 @@ import session from "express-session";
 import passport from "passport";
 import googlePassportConfig from "./lib/passport";
 import authRoute from "./routes/auth";
-import { PubSub } from "graphql-subscriptions";
+import { PubSub, withFilter } from "graphql-subscriptions";
 import { createServer } from "http";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { WebSocketServer } from "ws";
@@ -206,7 +206,7 @@ const pubsub = new PubSub();
             },
           },
         });
-        pubsub.publish(`messageSentToUser ${receiverId}`, {
+        pubsub.publish(`messageSentToUser`, {
           messageSentToUser: messageResponse,
         });
         return messageResponse;
@@ -220,10 +220,22 @@ const pubsub = new PubSub();
         },
       },
       messageSentToUser: {
-        subscribe: async (_: any, args: any, context: any) => {
-          const { receiverId } = args;
-          return pubsub.asyncIterator(`messageSentToUser ${receiverId}`);
-        },
+        subscribe: withFilter(
+          (_: any, args: any, context: any) => {
+            return pubsub.asyncIterator(`messageSentToUser`);
+          },
+          async (payload, args) => {
+            const { receiverId } = args;
+            const { messageSentToUser } = payload;
+            if (
+              messageSentToUser.receiver.id === receiverId ||
+              messageSentToUser.sender.id === receiverId
+            ) {
+              return true;
+            }
+            return false;
+          }
+        ),
       },
     },
   };

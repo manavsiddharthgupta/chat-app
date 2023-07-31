@@ -12,17 +12,14 @@ import { Input } from "./ui/input";
 import { Smile, SendHorizonal } from "lucide-react";
 import { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { Message } from "../lib/types";
 
 export const UserMessageInput = ({
   myId,
   friendId,
-  onSetMessage,
   email,
 }: {
   myId: string;
   friendId: string;
-  onSetMessage: (message: Message) => void;
   email: string;
 }) => {
   const [message, setMessage] = useState("");
@@ -53,8 +50,9 @@ export const UserMessageInput = ({
   `;
 
   const [sendMessage, { data, loading, error }] = useMutation(SEND_MESSAGE);
+  console.log(data);
 
-  const onSendMessage = () => {
+  const onSendMessage = async () => {
     sendMessage({
       variables: {
         body: message,
@@ -63,17 +61,6 @@ export const UserMessageInput = ({
       },
     });
     setMessage("");
-    onSetMessage({
-      body: message,
-      createdAt: `${Date.now()}`,
-      id: `${Date.now()}`,
-      sender: {
-        name: "You",
-        email: email,
-        __typename: "User",
-      },
-      __typename: "Message",
-    });
   };
 
   return (
