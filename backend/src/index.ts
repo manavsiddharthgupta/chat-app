@@ -20,7 +20,7 @@ type User = {
   id?: string;
 };
 
-export const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
 const app = express();
 const httpServer = createServer(app);
