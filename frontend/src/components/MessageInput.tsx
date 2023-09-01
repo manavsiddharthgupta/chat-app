@@ -58,6 +58,12 @@ export const MessageInput = ({
     setMessage("");
   };
 
+  const onEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onSendMessage();
+    }
+  };
+
   return (
     <div className="relative">
       <Input
@@ -65,6 +71,7 @@ export const MessageInput = ({
         onChange={onInputChangeHandler}
         placeholder="Type your message here ..."
         type="text"
+        onKeyDown={onEnterPress}
         className="bg-white text-black pl-10 pr-12 border-gray-300 placeholder:font-semibold placeholder:text-black rounded-b-3xl py-6"
       />
       <DropdownMenu>
