@@ -19,7 +19,7 @@ const httpLink = new HttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: 'ws://sendo-server.onrender.com/graphql/subscription'
+    url: 'wss://sendo-server.onrender.com/graphql/subscription'
   })
 )
 
