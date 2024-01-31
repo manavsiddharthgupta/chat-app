@@ -249,6 +249,7 @@ const pubsub = new PubSub()
   const serverCleanup = useServer({ schema }, wsServer)
 
   const server = new ApolloServer({
+    introspection: true,
     schema,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
