@@ -1,48 +1,48 @@
-import { ApolloServer } from "@apollo/server";
-import { typeDefs } from "./typeDefs";
-import { expressMiddleware } from "@apollo/server/express4";
-import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
-import express from "express";
-import cors from "cors";
-import { json } from "body-parser";
-import { PrismaClient } from "@prisma/client";
-import session from "express-session";
-import passport from "passport";
-import googlePassportConfig from "./lib/passport";
-import authRoute from "./routes/auth";
-import { PubSub, withFilter } from "graphql-subscriptions";
-import { createServer } from "http";
-import { makeExecutableSchema } from "@graphql-tools/schema";
-import { WebSocketServer } from "ws";
-import { useServer } from "graphql-ws/lib/use/ws";
+import { ApolloServer } from '@apollo/server'
+import { typeDefs } from './typeDefs'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import express from 'express'
+import cors from 'cors'
+import { json } from 'body-parser'
+import { PrismaClient } from '@prisma/client'
+import session from 'express-session'
+import passport from 'passport'
+import googlePassportConfig from './lib/passport'
+import authRoute from './routes/auth'
+import { PubSub, withFilter } from 'graphql-subscriptions'
+import { createServer } from 'http'
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { WebSocketServer } from 'ws'
+import { useServer } from 'graphql-ws/lib/use/ws'
 
 type User = {
-  id?: string;
-};
+  id?: string
+}
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
-const app = express();
-const httpServer = createServer(app);
+const app = express()
+const httpServer = createServer(app)
 
-app.use(cors());
+app.use(cors())
 
-const pubsub = new PubSub();
+const pubsub = new PubSub()
 
-(async function () {
+;(async function () {
   const resolvers = {
     Query: {
       getAllUsers: async () => {
-        return await prisma.user.findMany();
+        return await prisma.user.findMany()
       },
       getAllRooms: async () => {
-        return await prisma.room.findMany();
+        return await prisma.room.findMany()
       },
       getRoomData: async (_: any, args: any) => {
-        const { roomId } = args;
+        const { roomId } = args
         return await prisma.room.findUnique({
           where: {
-            id: roomId,
+            id: roomId
           },
           select: {
             id: true,
@@ -50,7 +50,7 @@ const pubsub = new PubSub();
             description: true,
             messages: {
               orderBy: {
-                createdAt: "asc",
+                createdAt: 'asc'
               },
               select: {
                 id: true,
@@ -60,27 +60,27 @@ const pubsub = new PubSub();
                   select: {
                     id: true,
                     name: true,
-                    email: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        })
       },
       getUserData: async (_: any, args: any) => {
-        const { friendId, myId } = args;
+        const { friendId, myId } = args
         const userData = await prisma.user.findUnique({
           where: {
-            id: friendId,
+            id: friendId
           },
           select: {
             id: true,
             name: true,
             email: true,
-            avatar: true,
-          },
-        });
+            avatar: true
+          }
+        })
 
         const uniqueMessage = await prisma.message.findMany({
           where: {
@@ -88,27 +88,27 @@ const pubsub = new PubSub();
               {
                 AND: [
                   {
-                    senderId: myId,
+                    senderId: myId
                   },
                   {
-                    receiverId: friendId,
-                  },
-                ],
+                    receiverId: friendId
+                  }
+                ]
               },
               {
                 AND: [
                   {
-                    senderId: friendId,
+                    senderId: friendId
                   },
                   {
-                    receiverId: myId,
-                  },
-                ],
-              },
-            ],
+                    receiverId: myId
+                  }
+                ]
+              }
+            ]
           },
           orderBy: {
-            createdAt: "asc",
+            createdAt: 'asc'
           },
           select: {
             id: true,
@@ -118,21 +118,21 @@ const pubsub = new PubSub();
               select: {
                 id: true,
                 name: true,
-                email: true,
-              },
-            },
-          },
-        });
-        return { ...userData, messages: uniqueMessage };
-      },
+                email: true
+              }
+            }
+          }
+        })
+        return { ...userData, messages: uniqueMessage }
+      }
     },
     Mutation: {
       createRoom: async (_: any, args: any) => {
-        const { name, description } = args;
+        const { name, description } = args
         return await prisma.room.create({
           data: {
             name,
-            description,
+            description
           },
           select: {
             id: true,
@@ -141,19 +141,19 @@ const pubsub = new PubSub();
             messages: {
               select: {
                 id: true,
-                body: true,
-              },
-            },
-          },
-        });
+                body: true
+              }
+            }
+          }
+        })
       },
       createMessage: async (_: any, args: any) => {
-        const { body, roomId, senderId } = args;
+        const { body, roomId, senderId } = args
         const messageResponse = await prisma.message.create({
           data: {
             body,
             senderId,
-            roomId,
+            roomId
           },
           select: {
             id: true,
@@ -163,28 +163,28 @@ const pubsub = new PubSub();
               select: {
                 id: true,
                 name: true,
-                email: true,
-              },
+                email: true
+              }
             },
             room: {
               select: {
-                id: true,
-              },
-            },
-          },
-        });
+                id: true
+              }
+            }
+          }
+        })
         pubsub.publish(`messageSent ${roomId}`, {
-          messageSent: messageResponse,
-        });
-        return messageResponse;
+          messageSent: messageResponse
+        })
+        return messageResponse
       },
       createMessagebyUser: async (_: any, args: any, context: any) => {
-        const { body, receiverId, senderId } = args;
+        const { body, receiverId, senderId } = args
         const messageResponse = await prisma.message.create({
           data: {
             body,
             receiverId,
-            senderId,
+            senderId
           },
           select: {
             id: true,
@@ -194,59 +194,59 @@ const pubsub = new PubSub();
               select: {
                 id: true,
                 name: true,
-                email: true,
-              },
+                email: true
+              }
             },
             receiver: {
               select: {
                 id: true,
                 name: true,
-                email: true,
-              },
-            },
-          },
-        });
+                email: true
+              }
+            }
+          }
+        })
         pubsub.publish(`messageSentToUser`, {
-          messageSentToUser: messageResponse,
-        });
-        return messageResponse;
-      },
+          messageSentToUser: messageResponse
+        })
+        return messageResponse
+      }
     },
     Subscription: {
       messageSent: {
         subscribe: async (_: any, args: any, context: any) => {
-          const { roomId } = args;
-          return pubsub.asyncIterator(`messageSent ${roomId}`);
-        },
+          const { roomId } = args
+          return pubsub.asyncIterator(`messageSent ${roomId}`)
+        }
       },
       messageSentToUser: {
         subscribe: withFilter(
           (_: any, args: any, context: any) => {
-            return pubsub.asyncIterator(`messageSentToUser`);
+            return pubsub.asyncIterator(`messageSentToUser`)
           },
           async (payload, args) => {
-            const { receiverId } = args;
-            const { messageSentToUser } = payload;
+            const { receiverId } = args
+            const { messageSentToUser } = payload
             if (
               messageSentToUser.receiver.id === receiverId ||
               messageSentToUser.sender.id === receiverId
             ) {
-              return true;
+              return true
             }
-            return false;
+            return false
           }
-        ),
-      },
-    },
-  };
+        )
+      }
+    }
+  }
 
-  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const schema = makeExecutableSchema({ typeDefs, resolvers })
 
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: "/graphql/subscription",
-  });
-  const serverCleanup = useServer({ schema }, wsServer);
+    path: '/graphql/subscription'
+  })
+  const serverCleanup = useServer({ schema }, wsServer)
 
   const server = new ApolloServer({
     schema,
@@ -256,56 +256,60 @@ const pubsub = new PubSub();
         async serverWillStart() {
           return {
             async drainServer() {
-              await serverCleanup.dispose();
-            },
-          };
-        },
-      },
-    ],
-  });
+              await serverCleanup.dispose()
+            }
+          }
+        }
+      }
+    ]
+  })
 
-  await server.start();
+  await server.start()
   app.use(
-    "/graphql",
+    '/graphql',
     cors<cors.CorsRequest>(),
     json(),
     expressMiddleware(server, {
-      context: async ({ req }) => ({ token: req.headers.token }),
+      context: async ({ req }) => ({ token: req.headers.token })
     })
-  );
+  )
 
   app.use(
     session({
-      secret: "secretcode",
+      secret: 'secretcode',
       resave: true,
       saveUninitialized: true,
       cookie: {
-        sameSite: "none",
+        sameSite: 'none',
         secure: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7, // One Week
-      },
+        maxAge: 1000 * 60 * 60 * 24 * 7 // One Week
+      }
     })
-  );
+  )
 
-  app.use(passport.initialize());
-  app.use(passport.session());
+  app.use(passport.initialize())
+  app.use(passport.session())
 
   passport.serializeUser((user: User, done) => {
-    console.log(user);
-    return done(null, user.id);
-  });
+    console.log(user)
+    return done(null, user.id)
+  })
 
   passport.deserializeUser((user: User, done) => {
     // Whatever we return goes to the client and binds to the req.user property
-    return done(null, user);
-  });
+    return done(null, user)
+  })
 
-  googlePassportConfig();
+  googlePassportConfig()
 
-  app.use("/auth", authRoute);
+  app.use('/auth', authRoute)
+
+  app.use('/', (_req, res) => {
+    return res.json({ data: 'nothing to see here :), goto `/graphql`' })
+  })
 
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: 4000 }, resolve)
-  );
-  console.log(`🚀 Server ready at http://localhost:4000/graphql`);
-})();
+    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+  )
+  console.log(`🚀 Server ready at http://localhost:4000/graphql`)
+})()
