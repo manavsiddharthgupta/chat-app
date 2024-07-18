@@ -24,7 +24,7 @@ function App() {
 
   const onHandleGoogleSignin = () => {
     console.log('google signin')
-    window.open('https://sendo-server.onrender.com/auth/google', '_self')
+    window.open('http://localhost:4000/auth/google', '_self')
   }
   return (
     <div className='bg-black min-h-screen text-white pt-20 pb-4 relative'>

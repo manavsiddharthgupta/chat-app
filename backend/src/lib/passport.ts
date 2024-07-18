@@ -7,7 +7,7 @@ const googlePassportConfig = () => {
       {
         clientID: `${process.env.GOOGLE_CLIENT_ID}`,
         clientSecret: `${process.env.GOOGLE_CLIENT_SECRET}`,
-        callbackURL: 'https://sendo-server.onrender.com/auth/google/callback'
+        callbackURL: 'http://localhost:4000/auth/google/callback'
       },
       function (_: any, __: any, profile: any, cb: any) {
         return cb(null, profile)

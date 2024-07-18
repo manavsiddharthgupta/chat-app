@@ -14,7 +14,7 @@ router.get(
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: 'https://sendo-beta.vercel.app/'
+    failureRedirect: 'http://localhost:3000/'
   }),
   async (req: any, res) => {
     try {
@@ -46,7 +46,7 @@ router.get(
       console.log(error)
     }
 
-    res.redirect('https://sendo-beta.vercel.app/chat')
+    res.redirect('http://localhost:3000/chat')
   }
 )
 

@@ -14,12 +14,12 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { InvalidChat } from './InvalidChat'
 
 const httpLink = new HttpLink({
-  uri: 'https://sendo-server.onrender.com/graphql'
+  uri: 'http://localhost:4000/graphql'
 })
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: 'wss://sendo-server.onrender.com/graphql/subscription'
+    url: 'wss://localhost:4000/graphql/subscription'
   })
 )
 
